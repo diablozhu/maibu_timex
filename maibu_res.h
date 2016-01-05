@@ -1,0 +1,6 @@
+#ifndef _MAIBU_RES_H
+#define _MAIBU_RES_H
+#define  RES_BITMAP_BACK  5001
+#define  RES_BITMAP_BLE_CON  5002
+#define  RES_BITMAP_BLE_DISCON  5003
+#endif

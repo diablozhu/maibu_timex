@@ -1,0 +1,24 @@
+{
+    "uuid": "b2514fa828c157cc4adade1131032b66",
+    "name": "timex",
+    "icon": "",
+    "version": "0.0.1",
+    "watchface": "true",
+    "resources": [
+      {
+        "type": "bmp",
+        "name": "RES_BITMAP_BACK",
+        "file": "background.bmp"
+      },
+      {
+        "type": "bmp",
+        "name": "RES_BITMAP_BLE_CON",
+        "file": "ble_con.bmp"
+      },
+      {
+        "type": "bmp",
+        "name": "RES_BITMAP_BLE_DISCON",
+        "file": "ble_discon.bmp"
+      }
+    ]
+}
