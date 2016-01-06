@@ -102,7 +102,7 @@ void get_sport_layer_str(char *str1,char *str2)
 	SportData data;
 	if (0 == maibu_get_sport_data(&data, 0)) {
 		sprintf(str1, "%d步", data.step);
-		sprintf(str2, "%d层", data.activity);
+		sprintf(str2, "%d层", data.floor);
 	}
 }
 
