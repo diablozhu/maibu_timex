@@ -278,7 +278,7 @@ void app_mwd_watch_time_change(enum SysEventType type, void *context)
 		get_height_layer_str(str);
 		app_layer_set_text_text(p_height_layer,str);
 
-		//蓝牙图层处理
+	/*	//蓝牙图层处理
 		GBitmap bitmap_ble_con;
 		GBitmap bitmap_ble_discon;
 		GRect frame_ble = { { BLE_ORIGIN_X,BLE_ORIGIN_Y },{ BLE_H,BLE_W } };
@@ -296,7 +296,7 @@ void app_mwd_watch_time_change(enum SysEventType type, void *context)
 			P_Layer layer_ble_new = app_layer_create_bitmap(&layer_bitmap_ble_con);
 			g_app_ble_layer_id = app_window_replace_layer(p_window, p_ble_layer, layer_ble_new);
 		}
-
+*/
 		app_window_update(p_window);
     }
 }
@@ -325,7 +325,7 @@ void app_timer_change()
 		P_Layer layer_ble_new = app_layer_create_bitmap(&layer_bitmap_ble_discon);
 		g_app_ble_layer_id = app_window_replace_layer(p_window, p_ble_layer, layer_ble_new);
 	}
-	if(ble_sta== BLE_STATUS_CONNECTED) {
+	else {
 		P_Layer layer_ble_new = app_layer_create_bitmap(&layer_bitmap_ble_con);
 		g_app_ble_layer_id = app_window_replace_layer(p_window, p_ble_layer, layer_ble_new);
 	}
