@@ -30,19 +30,19 @@
 #define DATE_WIDTH     111
 
 /*蓝牙*/
-#define BLE_ORIGIN_X     10
+#define BLE_ORIGIN_X     8
 #define BLE_ORIGIN_Y     8
 #define BLE_H       30
-#define BLE_W       42
+#define BLE_W       40
 
 //海拔
-#define HEIGHT_ORIGIN_X  59
+#define HEIGHT_ORIGIN_X  56
 #define HEIGHT_ORIGIN_Y  7
 #define HEIGHT_H    12
-#define HEIGHT_W    55
+#define HEIGHT_W    60
 
 /*运动量*/
-#define SPORT_ORIGIN_X  57
+#define SPORT_ORIGIN_X  56
 #define SPORT_ORIGIN_Y  89
 #define SPORT_HEIGHT    16
 #define SPORT_WIDTH    57
@@ -51,16 +51,16 @@
 #define FLOOR_ORIGIN_X  7
 #define FLOOR_ORIGIN_Y  89
 #define FLOOR_H    16
-#define FLOOR_W    47
+#define FLOOR_W    44
 
 //电量
 #define BATTERY_ORIGIN_X  15
-#define BATTERY_ORIGIN_Y  108
-#define BATTERY_H    14
+#define BATTERY_ORIGIN_Y  111
+#define BATTERY_H    12
 #define BATTERY_W    28
 
 
-static int8_t g_app_window_id = -1;
+static int32_t g_app_window_id = -1;
 static int8_t g_app_time_layer_id = -1;
 static int8_t g_app_date_layer_id = -1;
 static int8_t g_app_sport_layer_id = -1;
@@ -68,7 +68,8 @@ static int8_t g_app_floor_layer_id = -1;
 static int8_t g_app_battery_layer_id = -1;
 static int8_t g_app_ble_layer_id = -1;
 static int8_t g_app_height_layer_id = -1;
-static uint8_t app_timer_change_id = -1;
+static uint32_t app_timer_change_id = 1;
+static uint8_t g_app_ble_sta = 1;	//1为连接，2为断开
 
 void display_bitmap(P_Window pwindow)
 {
@@ -109,11 +110,16 @@ void get_sport_layer_str(char *str1,char *str2)
 void get_height_layer_str(char* str)
 {
 	int8_t iok;
-	float altitude,accuracy;
+/*	float altitude,accuracy;
 	iok = maibu_get_altitude (&altitude,&accuracy);
 	if(iok==0){
 		sprintf(str,"%gm",altitude);
 	}
+*/
+	float pressure;
+	iok = maibu_get_pressure(&pressure);
+	if(iok==0)
+		sprintf(str,"%.1fhpa",pressure);
 }
 
 void get_date_layer_str(char *str)
@@ -253,11 +259,7 @@ void app_mwd_watch_time_change(enum SysEventType type, void *context)
 
 		P_Layer p_floor_layer = app_window_get_layer_by_id(p_window, g_app_floor_layer_id);
 		if (NULL == p_floor_layer)
-			return;
-
-		P_Layer p_height_layer = app_window_get_layer_by_id(p_window, g_app_height_layer_id);
-		if (NULL == p_height_layer)
-			return;		
+			return;	
 		
         char str[20] = "";
 		char str2[20] = "";
@@ -274,9 +276,7 @@ void app_mwd_watch_time_change(enum SysEventType type, void *context)
 
 		get_battery_layer_str(str);
 		app_layer_set_text_text(p_battery_layer, str);
-		
-		get_height_layer_str(str);
-		app_layer_set_text_text(p_height_layer,str);
+
 
 	/*	//蓝牙图层处理
 		GBitmap bitmap_ble_con;
@@ -312,6 +312,14 @@ void app_timer_change()
 	if (NULL == p_ble_layer)
 		return;
 
+	P_Layer p_height_layer = app_window_get_layer_by_id(p_window, g_app_height_layer_id);
+	if (NULL == p_height_layer)
+		return;		
+
+	char str[30] = "init...";			
+	get_height_layer_str(str);
+	app_layer_set_text_text(p_height_layer,str);
+	
 	GBitmap bitmap_ble_con;
 	GBitmap bitmap_ble_discon;
 	GRect frame_ble = { { BLE_ORIGIN_X,BLE_ORIGIN_Y },{ BLE_H,BLE_W } };
@@ -324,10 +332,15 @@ void app_timer_change()
 	if (ble_sta != BLE_STATUS_CONNECTED) {
 		P_Layer layer_ble_new = app_layer_create_bitmap(&layer_bitmap_ble_discon);
 		g_app_ble_layer_id = app_window_replace_layer(p_window, p_ble_layer, layer_ble_new);
+		if(g_app_ble_sta==1){
+			g_app_ble_sta = 2;	//只在第一次断开时提示
+			maibu_service_vibes_pulse(VibesPulseTypeShort,1);
+		}
 	}
 	else {
 		P_Layer layer_ble_new = app_layer_create_bitmap(&layer_bitmap_ble_con);
 		g_app_ble_layer_id = app_window_replace_layer(p_window, p_ble_layer, layer_ble_new);
+		g_app_ble_sta = 1;
 	}
 
 	app_window_update(p_window);
@@ -352,6 +365,7 @@ P_Window init_mwd_window()
 
 int main()
 {
+//simulator_init();
     /*创建显示时间窗口*/
     P_Window p_window = init_mwd_window();
     if (p_window != NULL)
@@ -361,4 +375,5 @@ int main()
     }
 	//每隔10秒检测一次蓝牙状态
 	app_timer_change_id = app_service_timer_subscribe(1000*10, app_timer_change, NULL);
+//simulator_wait();
 }

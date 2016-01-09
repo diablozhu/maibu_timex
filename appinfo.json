@@ -2,7 +2,7 @@
     "uuid": "7ba6e231145cccff33c3325643bb6e4c",
     "name": "timex",
     "icon": "",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "watchface": "true",
     "resources": [
       {
